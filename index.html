@@ -301,31 +301,6 @@ function renderApt(apt, dataISO) {
   return div;
 }
 
-function renderDay(label, isToday, isoDate, apts) {
-  const section = document.createElement("div");
-  section.className = "day-section";
-
-  const header = document.createElement("div");
-  header.className = "day-header";
-  header.innerHTML = `
-    <span class="day-label${isToday ? " today" : ""}">${label}</span>
-    <span class="day-date">${formatDateLabel(isoDate)}</span>
-    <span class="day-count">${apts.length} appuntament${apts.length === 1 ? "o" : "i"}</span>
-  `;
-  section.appendChild(header);
-
-  if (apts.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "day-empty";
-    empty.textContent = "Nessun appuntamento";
-    section.appendChild(empty);
-  } else {
-    apts.forEach(apt => section.appendChild(renderApt(apt, isoDate)));
-  }
-
-  return section;
-}
-
 function renderApp(data) {
   const today    = todayISO();
   const tomorrow = nextWorkday(today);
