@@ -400,7 +400,7 @@ let pollTimer = null;
 async function fetchData() {
   try {
     // Cache-busting
-    const url = https://gist.githubusercontent.com/it-str/aad49f81909d000980cdac7d9c1b13ec/raw/7d499fe2496d2f6bc62854d021567cbb9152d844/lucavigni.json + "?t=" + Date.now();
+    const url = "https://gist.githubusercontent.com/it-str/aad49f81909d000980cdac7d9c1b13ec/raw/7d499fe2496d2f6bc62854d021567cbb9152d844/lucavigni.json" + "?t=" + Date.now();
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
