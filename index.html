@@ -125,23 +125,12 @@ body {
 .note-area {
   margin-top: 8px; padding-top: 8px;
   border-top: 1px solid var(--border);
-  display: flex; flex-direction: column; gap: 3px;
+  font-size: 0.78rem; line-height: 1.4;
 }
-.nota-breve {
-  font-size: 0.78rem; font-weight: 600; color: var(--blue-text);
-  display: flex; align-items: center; gap: 4px;
-}
-.nota-breve::before { content: "●"; font-size: 0.55rem; }
-.nota {
-  font-size: 0.78rem; color: var(--text-sec);
-  display: flex; align-items: flex-start; gap: 4px;
-}
-.nota::before { content: "◦"; flex-shrink: 0; margin-top: 1px; }
-.nota-estesa {
-  font-size: 0.75rem; color: var(--text-ter); font-style: italic;
-  display: flex; align-items: flex-start; gap: 4px;
-}
-.nota-estesa::before { content: "·"; flex-shrink: 0; }
+.nota-sep    { color: var(--text-ter); margin: 0 5px; }
+.nota-breve  { font-weight: 700; color: var(--blue-text); }
+.nota        { font-weight: 400; color: var(--text-sec); }
+.nota-estesa { font-weight: 400; font-style: italic; color: var(--text-ter); }
 .day-empty {
   background: var(--card); border: 1px dashed var(--border);
   border-radius: var(--radius); padding: 16px;
@@ -250,11 +239,11 @@ function renderApt(apt, isoDate) {
 
   let noteHtml = "";
   if (hasNote) {
-    let inner = "";
-    if (apt.nota_breve) inner += '<div class="nota-breve">' + esc(apt.nota_breve) + '</div>';
-    if (apt.nota)       inner += '<div class="nota">'       + esc(apt.nota)       + '</div>';
-    if (apt.nota_estesa)inner += '<div class="nota-estesa">'+ esc(apt.nota_estesa)+ '</div>';
-    noteHtml = '<div class="note-area">' + inner + '</div>';
+    let parts = [];
+    if (apt.nota_breve) parts.push('<span class="nota-breve">' + esc(apt.nota_breve) + '</span>');
+    if (apt.nota)       parts.push('<span class="nota">'       + esc(apt.nota)       + '</span>');
+    if (apt.nota_estesa)parts.push('<span class="nota-estesa">'+ esc(apt.nota_estesa)+ '</span>');
+    noteHtml = '<div class="note-area">' + parts.join('<span class="nota-sep">|</span>') + '</div>';
   }
 
   div.innerHTML =
@@ -403,7 +392,6 @@ function fetchData() {
 
 fetchData();
 setInterval(fetchData, POLL_INTERVAL);
-window.addEventListener("pageshow", function() { fetchData(); });
 </script>
 </body>
 </html>
