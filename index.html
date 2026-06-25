@@ -403,9 +403,7 @@ function fetchData() {
 
 fetchData();
 setInterval(fetchData, POLL_INTERVAL);
-document.addEventListener("visibilitychange", function() {
-  if (document.visibilityState === "visible") fetchData();
-});
+window.addEventListener("pageshow", function() { fetchData(); });
 </script>
 </body>
 </html>
