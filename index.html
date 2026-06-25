@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2c5f8a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Luca Vigni">
+<title>Luca Vigni — Planning</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root {
+  --bg:         #f2f2f0;
+  --card:       #ffffff;
+  --border:     #e2e2de;
+  --text:       #1a1a1a;
+  --text-sec:   #6b6b6b;
+  --text-ter:   #a0a0a0;
+  --blue:       #2c5f8a;
+  --blue-bg:    #eaf1f8;
+  --blue-text:  #1a4165;
+  --red-bg:     #fff0f0;
+  --red-text:   #b52a2a;
+  --red-border: #f5b8b8;
+  --green-bg:   #edfaf3;
+  --green-text: #1a6b3c;
+  --radius:     12px;
+  --radius-sm:  8px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:         #111111;
+    --card:       #1e1e1e;
+    --border:     #2e2e2e;
+    --text:       #f0f0f0;
+    --text-sec:   #9a9a9a;
+    --text-ter:   #6a6a6a;
+    --blue:       #5a9fd4;
+    --blue-bg:    #1a2e3e;
+    --blue-text:  #8dc0e8;
+    --red-bg:     #2a1414;
+    --red-text:   #f08080;
+    --red-border: #6b2020;
+    --green-bg:   #0d2018;
+    --green-text: #5ecb8a;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+
+/* ---- Header ---- */
+.app-header {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 16px 12px;
+  position: sticky; top: 0; z-index: 10;
+}
+.app-header-top {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.app-title { font-size: 1.05rem; font-weight: 600; color: var(--text); }
+.app-subtitle { font-size: 0.78rem; color: var(--text-sec); margin-top: 2px; }
+.status-badge {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 0.72rem; padding: 3px 9px;
+  border-radius: 20px; white-space: nowrap;
+}
+.status-badge.ok  { background: var(--green-bg); color: var(--green-text); }
+.status-badge.err { background: var(--red-bg);   color: var(--red-text);   }
+.status-badge.loading { background: var(--blue-bg); color: var(--blue-text); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.export-line {
+  margin-top: 6px; font-size: 0.73rem; color: var(--text-ter);
+}
+
+/* ---- Body ---- */
+.content { padding: 12px 12px 24px; }
+
+/* ---- Day section ---- */
+.day-section { margin-bottom: 20px; }
+.day-header {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 4px 4px 6px;
+}
+.day-label {
+  font-size: 0.72rem; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--text-sec);
+}
+.day-label.today { color: var(--blue); }
+.day-date  { font-size: 0.82rem; color: var(--text-sec); }
+.day-count { font-size: 0.72rem; color: var(--text-ter); margin-left: auto; }
+
+/* ---- Appointment card ---- */
+.apt {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 11px 13px;
+  margin-bottom: 7px;
+  transition: opacity .3s;
+}
+.apt.past { opacity: 0.4; }
+.apt-top { display: flex; align-items: flex-start; gap: 10px; }
+
+.apt-time {
+  min-width: 52px;
+  font-size: 0.9rem; font-weight: 600; color: var(--text);
+  line-height: 1.3;
+}
+.apt-time-end {
+  display: block;
+  font-size: 0.72rem; font-weight: 400; color: var(--text-ter);
+}
+
+.apt-body { flex: 1; min-width: 0; }
+.apt-name-row { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
+.apt-name {
+  font-size: 0.95rem; font-weight: 500; color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: calc(100% - 70px);
+}
+.apt-name.cancelled {
+  text-decoration: line-through;
+  color: var(--text-ter);
+}
+.badge-disdetta {
+  font-size: 0.68rem; padding: 1px 7px;
+  border-radius: 20px; white-space: nowrap;
+  background: var(--red-bg); color: var(--red-text);
+  border: 1px solid var(--red-border);
+}
+.apt-service {
+  font-size: 0.75rem; color: var(--text-sec);
+  margin-top: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.apt-cabina {
+  font-size: 0.72rem; color: var(--text-ter);
+}
+
+/* ---- Note ---- */
+.note-area {
+  margin-top: 8px; padding-top: 8px;
+  border-top: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 3px;
+}
+.nota-breve {
+  font-size: 0.78rem; font-weight: 600;
+  color: var(--blue-text);
+  display: flex; align-items: center; gap: 4px;
+}
+.nota-breve::before { content: "●"; font-size: 0.55rem; }
+.nota {
+  font-size: 0.78rem; color: var(--text-sec);
+  display: flex; align-items: flex-start; gap: 4px;
+}
+.nota::before { content: "◦"; flex-shrink: 0; margin-top: 1px; }
+.nota-estesa {
+  font-size: 0.75rem; color: var(--text-ter);
+  font-style: italic;
+  display: flex; align-items: flex-start; gap: 4px;
+}
+.nota-estesa::before { content: "·"; flex-shrink: 0; }
+
+/* ---- Empty day ---- */
+.day-empty {
+  background: var(--card); border: 1px dashed var(--border);
+  border-radius: var(--radius); padding: 16px;
+  text-align: center; font-size: 0.82rem; color: var(--text-ter);
+}
+
+/* ---- Error / loading screens ---- */
+.screen {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 60vh; gap: 12px; padding: 2rem;
+  text-align: center;
+}
+.screen .icon { font-size: 2.5rem; }
+.screen p { font-size: 0.9rem; color: var(--text-sec); max-width: 280px; }
+.screen .detail { font-size: 0.75rem; color: var(--text-ter); }
+
+/* ---- Refresh button ---- */
+.refresh-btn {
+  display: block; margin: 0 auto 1rem;
+  padding: 0.5rem 1.4rem; font-size: 0.82rem;
+  background: var(--blue-bg); color: var(--blue-text);
+  border: 1px solid var(--blue); border-radius: 20px;
+  cursor: pointer; text-align: center;
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div class="screen" id="loading-screen">
+    <div class="icon">⏳</div>
+    <p>Caricamento planning in corso…</p>
+  </div>
+</div>
+
+<script>
+// ---------------------------------------------------------------------------
+// Configurazione — sostituire con i valori reali prima del deploy
+// ---------------------------------------------------------------------------
+const GIST_ID       = "INSERISCI_GIST_ID";
+const GIST_FILENAME = "lucavigni.json";
+const POLL_INTERVAL = 60 * 1000; // ms
+
+// Il token di accesso viene letto dall'hash dell'URL: #TOKEN
+// Esempio URL: https://it-str.github.io/lucavigni/#abc123token
+// ---------------------------------------------------------------------------
+
+const GIST_RAW_URL = `https://gist.githubusercontent.com/it-str/aad49f81909d000980cdac7d9c1b13ec/raw/7d499fe2496d2f6bc62854d021567cbb9152d844/lucavigni.json`;
+
+// Nomi mesi e giorni in italiano
+const MESI  = ["gennaio","febbraio","marzo","aprile","maggio","giugno",
+                "luglio","agosto","settembre","ottobre","novembre","dicembre"];
+const GIORNI = ["domenica","lunedì","martedì","mercoledì","giovedì","venerdì","sabato"];
+
+// ---------------------------------------------------------------------------
+// Utilità date
+// ---------------------------------------------------------------------------
+
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+
+function nextWorkday(isoDate) {
+  const d = new Date(isoDate + "T12:00:00");
+  d.setDate(d.getDate() + 1);
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function formatDateLabel(isoDate) {
+  const d = new Date(isoDate + "T12:00:00");
+  return `${GIORNI[d.getDay()]} ${d.getDate()} ${MESI[d.getMonth()]}`;
+}
+
+function isPast(dalleStr, dataISO) {
+  const now = new Date();
+  const [h, m] = dalleStr.split(":").map(Number);
+  const apt = new Date(dataISO + "T00:00:00");
+  apt.setHours(h, m + 10, 0, 0); // 10 min di tolleranza (fine appuntamento approssimata)
+  // Usiamo dalle + 60min come stima della fine se "alle" non è disponibile
+  return now > apt;
+}
+
+// ---------------------------------------------------------------------------
+// Rendering
+// ---------------------------------------------------------------------------
+
+function renderApt(apt, dataISO) {
+  const past = isPast(apt.dalle, dataISO);
+  const hasDisdetta = apt.disdetta && apt.disdetta.trim() !== "";
+  const hasNote = apt.nota_breve || apt.nota || apt.nota_estesa;
+
+  const div = document.createElement("div");
+  div.className = "apt" + (past ? " past" : "");
+
+  // Servizio abbreviato (rimuove ripetizioni verbose)
+  let servizio = (apt.servizio || "").replace(/\s+/g, " ").trim();
+
+  // Cabina
+  let cabinaBit = "";
+  if (apt.cabina) cabinaBit = ` · <span class="apt-cabina">${esc(apt.cabina)}</span>`;
+
+  // Note
+  let noteBit = "";
+  if (hasNote) {
+    let noteInner = "";
+    if (apt.nota_breve) noteInner += `<div class="nota-breve">${esc(apt.nota_breve)}</div>`;
+    if (apt.nota)       noteInner += `<div class="nota">${esc(apt.nota)}</div>`;
+    if (apt.nota_estesa)noteInner += `<div class="nota-estesa">${esc(apt.nota_estesa)}</div>`;
+    noteBit = `<div class="note-area">${noteInner}</div>`;
+  }
+
+  div.innerHTML = `
+    <div class="apt-top">
+      <div class="apt-time">${esc(apt.dalle)}<span class="apt-time-end">${esc(apt.alle)}</span></div>
+      <div class="apt-body">
+        <div class="apt-name-row">
+          <span class="apt-name${hasDisdetta ? " cancelled" : ""}">${esc(apt.nominativo)}</span>
+          ${hasDisdetta ? `<span class="badge-disdetta">disdetta</span>` : ""}
+        </div>
+        <div class="apt-service">${esc(servizio)}${cabinaBit}</div>
+      </div>
+    </div>
+    ${noteBit}
+  `;
+  return div;
+}
+
+function renderDay(label, isToday, isoDate, apts) {
+  const section = document.createElement("div");
+  section.className = "day-section";
+
+  const header = document.createElement("div");
+  header.className = "day-header";
+  header.innerHTML = `
+    <span class="day-label${isToday ? " today" : ""}">${label}</span>
+    <span class="day-date">${formatDateLabel(isoDate)}</span>
+    <span class="day-count">${apts.length} appuntament${apts.length === 1 ? "o" : "i"}</span>
+  `;
+  section.appendChild(header);
+
+  if (apts.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "day-empty";
+    empty.textContent = "Nessun appuntamento";
+    section.appendChild(empty);
+  } else {
+    apts.forEach(apt => section.appendChild(renderApt(apt, isoDate)));
+  }
+
+  return section;
+}
+
+function renderApp(data) {
+  const today    = todayISO();
+  const tomorrow = nextWorkday(today);
+  const giorni   = data.giorni || {};
+
+  const todayApts    = giorni[today]    || [];
+  const tomorrowApts = giorni[tomorrow] || [];
+
+  const exportDt = data.export_dt || null;
+
+  const header = document.createElement("div");
+  header.className = "app-header";
+  header.innerHTML = `
+    <div class="app-header-top">
+      <div>
+        <div class="app-title">Luca Vigni</div>
+        <div class="app-subtitle">Riabilitazione in acqua</div>
+      </div>
+      <div class="status-badge ok">
+        <span class="status-dot"></span> aggiornato
+      </div>
+    </div>
+    ${exportDt ? `<div class="export-line">Aggiornato: ${esc(exportDt)}</div>` : ""}
+  `;
+
+  const content = document.createElement("div");
+  content.className = "content";
+  content.appendChild(renderDay("Oggi",   true,  today,    todayApts));
+  content.appendChild(renderDay("Domani", false, tomorrow, tomorrowApts));
+
+  // Bottone refresh manuale
+  const btn = document.createElement("button");
+  btn.className = "refresh-btn";
+  btn.textContent = "↻ Aggiorna ora";
+  btn.addEventListener("click", () => fetchData());
+  content.appendChild(btn);
+
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+  app.appendChild(header);
+  app.appendChild(content);
+}
+
+function renderError(msg) {
+  document.getElementById("app").innerHTML = `
+    <div class="app-header">
+      <div class="app-header-top">
+        <div>
+          <div class="app-title">Luca Vigni</div>
+          <div class="app-subtitle">Riabilitazione in acqua</div>
+        </div>
+        <div class="status-badge err">
+          <span class="status-dot"></span> errore
+        </div>
+      </div>
+    </div>
+    <div class="screen">
+      <div class="icon">⚠️</div>
+      <p>${esc(msg)}</p>
+      <p class="detail">Riprova tra qualche istante.</p>
+      <button class="refresh-btn" onclick="fetchData()">↻ Riprova</button>
+    </div>
+  `;
+}
+
+// ---------------------------------------------------------------------------
+// Fetch dati dal Gist
+// ---------------------------------------------------------------------------
+
+let pollTimer = null;
+
+async function fetchData() {
+  try {
+    // Cache-busting
+    const url = GIST_RAW_URL + "?t=" + Date.now();
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    renderApp(data);
+  } catch (e) {
+    renderError("Impossibile caricare il planning. " + e.message);
+  }
+}
+
+function startPolling() {
+  if (pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(fetchData, POLL_INTERVAL);
+}
+
+// ---------------------------------------------------------------------------
+// Aggiornamento appuntamenti passati (ogni minuto, lato client)
+// ---------------------------------------------------------------------------
+
+function refreshPastClasses() {
+  const apts = document.querySelectorAll(".apt");
+  apts.forEach(el => {
+    const timeEl = el.querySelector(".apt-time");
+    if (!timeEl) return;
+    const dalle = timeEl.textContent.trim().slice(0, 5);
+
+    // Leggi la data dal dataset (impostata durante il rendering)
+    const dataISO = el.dataset.date;
+    if (!dataISO) return;
+
+    if (isPast(dalle, dataISO)) el.classList.add("past");
+    else el.classList.remove("past");
+  });
+}
+
+// Riscriviamo renderApt per includere data-date
+// (sovrascrive la funzione definita sopra)
+const _renderAptOrig = renderApt;
+// Patch: aggiungi data-date all'elemento apt
+const _renderAptPatched = function(apt, dataISO) {
+  const el = _renderAptOrig(apt, dataISO);
+  el.dataset.date = dataISO;
+  return el;
+};
+// Sostituiamo silenziosamente renderDay per usare la versione patchata
+function renderDay(label, isToday, isoDate, apts) {
+  const section = document.createElement("div");
+  section.className = "day-section";
+
+  const header = document.createElement("div");
+  header.className = "day-header";
+  header.innerHTML = `
+    <span class="day-label${isToday ? " today" : ""}">${label}</span>
+    <span class="day-date">${formatDateLabel(isoDate)}</span>
+    <span class="day-count">${apts.length} appuntament${apts.length === 1 ? "o" : "i"}</span>
+  `;
+  section.appendChild(header);
+
+  if (apts.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "day-empty";
+    empty.textContent = "Nessun appuntamento";
+    section.appendChild(empty);
+  } else {
+    apts.forEach(apt => section.appendChild(_renderAptPatched(apt, isoDate)));
+  }
+
+  return section;
+}
+
+setInterval(refreshPastClasses, 60 * 1000);
+
+// ---------------------------------------------------------------------------
+// Utilità escape XSS
+// ---------------------------------------------------------------------------
+
+function esc(str) {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+// ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
+
+fetchData();
+startPolling();
+</script>
+</body>
+</html>
